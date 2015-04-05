@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		495B539E1A90189900B131E7 /* ClarifaiApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495B539D1A90189900B131E7 /* ClarifaiApi.swift */; };
 		499CEB181A90057C00EC800A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499CEB171A90057C00EC800A /* AppDelegate.swift */; };
 		499CEB1B1A90057C00EC800A /* Claire.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 499CEB191A90057C00EC800A /* Claire.xcdatamodeld */; };
 		499CEB1D1A90057C00EC800A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499CEB1C1A90057C00EC800A /* ViewController.swift */; };
@@ -15,9 +14,10 @@
 		499CEB221A90057C00EC800A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 499CEB211A90057C00EC800A /* Images.xcassets */; };
 		499CEB251A90057C00EC800A /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 499CEB231A90057C00EC800A /* LaunchScreen.xib */; };
 		499CEB311A90057C00EC800A /* ClaireTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499CEB301A90057C00EC800A /* ClaireTests.swift */; };
-		49DAF9F21AD09244001EBF0C /* JSONHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DAF9F11AD09244001EBF0C /* JSONHelper.swift */; };
-		49DAF9F41AD0B056001EBF0C /* RecognitionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DAF9F31AD0B056001EBF0C /* RecognitionResult.swift */; };
 		49DAF9F61AD0BC9B001EBF0C /* metro-north.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 49DAF9F51AD0BC9B001EBF0C /* metro-north.jpg */; };
+		49DAF9FD1AD0C45C001EBF0C /* ClarifaiApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DAF9FA1AD0C45C001EBF0C /* ClarifaiApi.swift */; };
+		49DAF9FE1AD0C45C001EBF0C /* JSONHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DAF9FB1AD0C45C001EBF0C /* JSONHelper.swift */; };
+		49DAF9FF1AD0C45C001EBF0C /* RecognitionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DAF9FC1AD0C45C001EBF0C /* RecognitionResult.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,7 +31,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		495B539D1A90189900B131E7 /* ClarifaiApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClarifaiApi.swift; sourceTree = "<group>"; };
 		499CEB121A90057C00EC800A /* Claire.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Claire.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		499CEB161A90057C00EC800A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		499CEB171A90057C00EC800A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -43,9 +42,10 @@
 		499CEB2A1A90057C00EC800A /* ClaireTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ClaireTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		499CEB2F1A90057C00EC800A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		499CEB301A90057C00EC800A /* ClaireTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaireTests.swift; sourceTree = "<group>"; };
-		49DAF9F11AD09244001EBF0C /* JSONHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONHelper.swift; sourceTree = "<group>"; };
-		49DAF9F31AD0B056001EBF0C /* RecognitionResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecognitionResult.swift; sourceTree = "<group>"; };
 		49DAF9F51AD0BC9B001EBF0C /* metro-north.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "metro-north.jpg"; sourceTree = "<group>"; };
+		49DAF9FA1AD0C45C001EBF0C /* ClarifaiApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClarifaiApi.swift; sourceTree = "<group>"; };
+		49DAF9FB1AD0C45C001EBF0C /* JSONHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONHelper.swift; sourceTree = "<group>"; };
+		49DAF9FC1AD0C45C001EBF0C /* RecognitionResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecognitionResult.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,16 +66,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		495B539C1A90187A00B131E7 /* Lib */ = {
-			isa = PBXGroup;
-			children = (
-				495B539D1A90189900B131E7 /* ClarifaiApi.swift */,
-				49DAF9F11AD09244001EBF0C /* JSONHelper.swift */,
-				49DAF9F31AD0B056001EBF0C /* RecognitionResult.swift */,
-			);
-			name = Lib;
-			sourceTree = "<group>";
-		};
 		499CEB091A90057C00EC800A = {
 			isa = PBXGroup;
 			children = (
@@ -97,8 +87,8 @@
 		499CEB141A90057C00EC800A /* Claire */ = {
 			isa = PBXGroup;
 			children = (
+				49DAF9F91AD0C42C001EBF0C /* Client */,
 				49DAF9F51AD0BC9B001EBF0C /* metro-north.jpg */,
-				495B539C1A90187A00B131E7 /* Lib */,
 				499CEB171A90057C00EC800A /* AppDelegate.swift */,
 				499CEB1C1A90057C00EC800A /* ViewController.swift */,
 				499CEB1E1A90057C00EC800A /* Main.storyboard */,
@@ -133,6 +123,16 @@
 				499CEB2F1A90057C00EC800A /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		49DAF9F91AD0C42C001EBF0C /* Client */ = {
+			isa = PBXGroup;
+			children = (
+				49DAF9FA1AD0C45C001EBF0C /* ClarifaiApi.swift */,
+				49DAF9FB1AD0C45C001EBF0C /* JSONHelper.swift */,
+				49DAF9FC1AD0C45C001EBF0C /* RecognitionResult.swift */,
+			);
+			path = Client;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -236,12 +236,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				49DAF9F41AD0B056001EBF0C /* RecognitionResult.swift in Sources */,
+				49DAF9FD1AD0C45C001EBF0C /* ClarifaiApi.swift in Sources */,
 				499CEB1D1A90057C00EC800A /* ViewController.swift in Sources */,
-				495B539E1A90189900B131E7 /* ClarifaiApi.swift in Sources */,
+				49DAF9FF1AD0C45C001EBF0C /* RecognitionResult.swift in Sources */,
 				499CEB181A90057C00EC800A /* AppDelegate.swift in Sources */,
+				49DAF9FE1AD0C45C001EBF0C /* JSONHelper.swift in Sources */,
 				499CEB1B1A90057C00EC800A /* Claire.xcdatamodeld in Sources */,
-				49DAF9F21AD09244001EBF0C /* JSONHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
