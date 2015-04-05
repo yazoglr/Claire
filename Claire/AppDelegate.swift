@@ -17,6 +17,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+//        let clientID = "P0tbQmf7axVK7gbrPmpjFKkwsj4BTolZmIaAnOKr"
+//        let clientSecret = "XxhusB12PKEFqVogSHrtgaCpbQ9pDaowJUqHp6bE"
+//        let c = ClarifaiApi(appID: clientID , appSecret: clientSecret)
+        //c.getAccesToken(renew: true, success: { String -> Void in () }, failure: { NSError -> Void in () })
+        //c.accessToken = "qLs3RgHbe2J3iKkohI9FYuALTuYjjw";
+        //c.tagUrls(["http://www.clarifai.com/img/metro-north.jpg" , "http://www.clarifai.com/static/img_ours/autotag_examples/bridge.jpg"])
+        //usleep(10000000)
+//        c.getInfo({ (info : ApiInfo) -> Void in println(info.minImageSize);println(info.maxBatchSize);println(info.maxImageSize); println(info.embedAllowed)  }, failure: { (r : Reason , d : NSData?) -> Void in println(r) })
+        
+//       let img = UIImage(named: "metro-north.jpg")!
+//        
+//        c.recognizeMedia(Operation.TagAndEmbed, media: [("metro",img)] ,
+//            success: { (rec : [RecognitionResult] ) -> Void in
+//                for item in rec {
+//                    println(item.tags?[5])
+//                }
+//            },failure: { (r : Reason , d : NSData?) -> Void in println(r) })
+        
+        
+//       c.recognizeURLs(Operation.TagAndEmbed, urls: ["http://www.clarifai.com/img/metro-north.jpg","http://www.clarifai.com/img/metro-north.jpg"] ,
+//        success: { (rec : [RecognitionResult] ) -> Void in
+//            for item in rec {
+//                println(item.tags?[5])
+//            }
+//        },failure: { (r : Reason , d : NSData?) -> Void in println(r) })
+        
+        
+//        usleep(1000000)
+//        c.getInfo({ (info : ApiInfo) -> Void in println(info.minImageSize);println(info.maxBatchSize);println(info.maxImageSize); println(info.embedAllowed)  }, failure: { (r : Reason , d : NSData?) -> Void in println(r) })
         return true
     }
 
