@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		492DBADF1AD202EF0062D4B3 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492DBADE1AD202EF0062D4B3 /* Enums.swift */; };
+		4964256C1AD1440300A2050D /* ApiInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4964256B1AD1440300A2050D /* ApiInfo.swift */; };
 		499CEB181A90057C00EC800A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499CEB171A90057C00EC800A /* AppDelegate.swift */; };
 		499CEB1B1A90057C00EC800A /* Claire.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 499CEB191A90057C00EC800A /* Claire.xcdatamodeld */; };
 		499CEB1D1A90057C00EC800A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499CEB1C1A90057C00EC800A /* ViewController.swift */; };
@@ -31,6 +33,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		492DBADE1AD202EF0062D4B3 /* Enums.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		4964256B1AD1440300A2050D /* ApiInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiInfo.swift; sourceTree = "<group>"; };
 		499CEB121A90057C00EC800A /* Claire.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Claire.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		499CEB161A90057C00EC800A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		499CEB171A90057C00EC800A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -131,6 +135,8 @@
 				49DAF9FA1AD0C45C001EBF0C /* ClarifaiApi.swift */,
 				49DAF9FB1AD0C45C001EBF0C /* JSONHelper.swift */,
 				49DAF9FC1AD0C45C001EBF0C /* RecognitionResult.swift */,
+				4964256B1AD1440300A2050D /* ApiInfo.swift */,
+				492DBADE1AD202EF0062D4B3 /* Enums.swift */,
 			);
 			path = Client;
 			sourceTree = "<group>";
@@ -240,7 +246,9 @@
 				499CEB1D1A90057C00EC800A /* ViewController.swift in Sources */,
 				49DAF9FF1AD0C45C001EBF0C /* RecognitionResult.swift in Sources */,
 				499CEB181A90057C00EC800A /* AppDelegate.swift in Sources */,
+				4964256C1AD1440300A2050D /* ApiInfo.swift in Sources */,
 				49DAF9FE1AD0C45C001EBF0C /* JSONHelper.swift in Sources */,
+				492DBADF1AD202EF0062D4B3 /* Enums.swift in Sources */,
 				499CEB1B1A90057C00EC800A /* Claire.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -9,20 +9,11 @@
 import Foundation
 import UIKit
 
-class ClarifaiApi
+public class ClarifaiApi
 {
-    internal let appID : String
-    internal let appSecret : String
-    
-    let baseURL : NSURL = NSURL(string : "https://api.clarifai.com")!
-    let apiVersion = "v1"
-    
-    var accessToken : String?
-    var apiInfo : ApiInfo?
-    
-    var maxCallCount : Int = 3;
-    
-    typealias FailureHandler = ((Reason , NSData?) -> Void)
+    // TODO : Feedback is not implemented 
+    // TODO : Images are not resized
+    // TODO : No repeating on Throttle
     
     enum Endpoint : String
     {
@@ -34,13 +25,26 @@ class ClarifaiApi
         case Embed = "/embed"
     }
     
-    required init(appID : String , appSecret : String)
+    internal let appID : String
+    internal let appSecret : String
+    
+    private let baseURL : NSURL = NSURL(string : "https://api.clarifai.com")!
+    private let apiVersion = "v1"
+    
+    private var accessToken : String?
+    var apiInfo : ApiInfo?
+    
+    private let maxCallCount : Int = 3;
+    
+    typealias FailureHandler = ((FailReason , NSData?) -> Void)
+    
+    public required init(appID : String , appSecret : String)
     {
         self.appID = appID
         self.appSecret = appSecret
     }
     
-    func getAccesToken(renew : Bool = false , success : String -> Void , failure : FailureHandler)
+    private func getAccesToken(renew : Bool = false , success : String -> Void , failure : FailureHandler)
     {
         if renew || accessToken == nil
         {
@@ -132,7 +136,7 @@ class ClarifaiApi
     
     func recognizeURLs(op : Operation , urls : [String] , success : ([RecognitionResult] -> Void) , failure : FailureHandler){
         var params = [String : AnyObject]()
-        params["op"] = op.toString()
+        params["op"] = op.description
         params["model"] = "default"
         params["url"] = urls
         
@@ -144,7 +148,7 @@ class ClarifaiApi
     
     func recognizeMedia( op : Operation , media : [ ( fileName:String,image : UIImage) ] , success : ([RecognitionResult] -> Void) , failure : FailureHandler) {
         var params = [String : String]()
-        params["op"] = op.toString()
+        params["op"] = op.description
         params["model"] = "default"
         let boundary = "----------asdaadas1ewedbfandaus1edasdassddwwertttr" // TODO : Change
         let body = createMultipartBody(boundary, params : params , media : media)!
@@ -162,12 +166,12 @@ class ClarifaiApi
         requestWithToken(headers, body: body, method: method, url: url, maxCallCount: maxCallCount, parse: dataParser, success: success, failure: failure)
     }
     
-    func urlForEndpoint(endpoint : Endpoint) -> NSURL
+    private func urlForEndpoint(endpoint : Endpoint) -> NSURL
     {
         return baseURL.URLByAppendingPathComponent("/\(apiVersion)\(endpoint.rawValue)")
     }
     
-    func createJSONBody(params : [String : AnyObject]) -> NSData?
+    private func createJSONBody(params : [String : AnyObject]) -> NSData?
     {
         //var jDict = [String : AnyObject]()
         //jDict["op"] = "tag"
@@ -179,7 +183,7 @@ class ClarifaiApi
     
     //Boundary might be converted to inout.
     //Currently the return value is never optional , dangerous forced unwrapping exists. Might wanna change that.
-    func createMultipartBody(boundary : String , params : [String : String] , media : [ ( fileName:String,image : UIImage) ]) -> NSData?
+    private func createMultipartBody(boundary : String , params : [String : String] , media : [ ( fileName:String,image : UIImage) ]) -> NSData?
     {
         let appendString : (NSMutableData , String) -> Void = { data , str -> Void in data.appendData( NSString(string:str).dataUsingEncoding(NSUTF8StringEncoding)! )}
         let appendBoundary : (NSMutableData -> Void) = { data -> Void in  appendString(data , "--\(boundary)\r\n")  }
@@ -228,7 +232,7 @@ class ClarifaiApi
 //    }
     
     
-    func requestWithToken<T>(headers : [String:String] , body : NSData , method : String , url : NSURL , maxCallCount : Int , shouldRenewToken:Bool = false , parse : JSONHelper.JSONDictionary -> T? ,  success : T -> Void , failure : (Reason,NSData?) -> Void ) -> Void
+    private func requestWithToken<T>(headers : [String:String] , body : NSData , method : String , url : NSURL , maxCallCount : Int , shouldRenewToken:Bool = false , parse : JSONHelper.JSONDictionary -> T? ,  success : T -> Void , failure : (FailReason,NSData?) -> Void ) -> Void
     {
         if(maxCallCount > 0) {
             getAccesToken(renew: shouldRenewToken, success: { [weak self] token -> Void in
@@ -286,36 +290,5 @@ class ClarifaiApi
     }
 }
 
-public enum Operation {
-    case Embed , Tag , TagAndEmbed
-    
-    public func toString() -> String {
-        switch(self){
-        case .Embed : return "embed"
-        case .Tag : return "tag"
-        default : return "tag,embed"
-        }
-    }
-}
-
-//Courtesy of Chris Eidhof
-public enum Reason {
-    case CouldNotGetToken
-    case CouldNotParseData
-    case CouldNotParseJSON
-    case NoData
-    case NoSuccessStatusCode(statusCode: Int)
-    case ReachedMaxNumberOfCalls
-    case ApiThrottled
-    case Other(NSError)
-}
-
-public struct ApiInfo
-{
-    var maxImageSize : Int?
-    var minImageSize : Int? 
-    var maxBatchSize : Int?
-    var embedAllowed : Bool?
-}
 
 
