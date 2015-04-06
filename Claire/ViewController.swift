@@ -55,8 +55,15 @@ class ViewController: UIViewController {
         api?.recognizeURLs(.TagAndEmbed, urls: ["http://www.clarifai.com/static/img_ours/autotag_examples/coffee.jpg"], success: recognitionHandler, failure: failHandlerMaker("Failure while recognizing images"))
         
         //Recognizing images from local data
+        //A note on the media parameter , it is an array of tuple (String , UIImage) where the string represents the filename
         let img = UIImage(named: "metro-north.jpg")!
         api?.recognizeMedia(Operation.TagAndEmbed, media: [("metro",img)] , success : recognitionHandler , failure : failHandlerMaker("Failure while recognizing media"))
+        
+        //Sending feedback example
+        api?.sendFeedback(["78c742b9dee940c8cf2a06f860025141"] ,dissimilarDocids: ["acd57ec10abcc0f4507475827626785f"],
+            success: { str in println("Printing feedback result"); println(str); println("Done printing feedback result.") },
+            failure: failHandlerMaker("Failure while getting feedback"))
+//
     }
     
     override func didReceiveMemoryWarning() {

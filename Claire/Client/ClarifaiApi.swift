@@ -14,6 +14,7 @@ public class ClarifaiApi
     // TODO : Feedback is not implemented 
     // TODO : Images are not resized
     // TODO : No repeating on Throttle
+    // TODO : Tests 
     
     enum Endpoint : String
     {
@@ -36,7 +37,7 @@ public class ClarifaiApi
     
     private let maxCallCount : Int = 3;
     
-    typealias FailureHandler = ((FailReason , NSData?) -> Void)
+    public typealias FailureHandler = ((FailReason , NSData?) -> Void)
     
     public required init(appID : String , appSecret : String)
     {
@@ -134,7 +135,7 @@ public class ClarifaiApi
         return nil
     }
     
-    func recognizeURLs(op : Operation , urls : [String] , success : ([RecognitionResult] -> Void) , failure : FailureHandler){
+    public func recognizeURLs(op : Operation , urls : [String] , success : ([RecognitionResult] -> Void) , failure : FailureHandler){
         var params = [String : AnyObject]()
         params["op"] = op.description
         params["model"] = "default"
@@ -146,7 +147,7 @@ public class ClarifaiApi
         recognize(headers, body: body, success: success, failure: failure)
     }
     
-    func recognizeMedia( op : Operation , media : [ ( fileName:String,image : UIImage) ] , success : ([RecognitionResult] -> Void) , failure : FailureHandler) {
+    public func recognizeMedia( op : Operation , media : [ ( fileName:String,image : UIImage) ] , success : ([RecognitionResult] -> Void) , failure : FailureHandler) {
         var params = [String : String]()
         params["op"] = op.description
         params["model"] = "default"
@@ -164,6 +165,36 @@ public class ClarifaiApi
         let url = urlForEndpoint(.Multiop)
         
         requestWithToken(headers, body: body, method: method, url: url, maxCallCount: maxCallCount, parse: dataParser, success: success, failure: failure)
+    }
+    
+    //TODO : Modify 
+    //TODO : Add capability of sending feedback using urls
+    func sendFeedback( docids : [String] , addTags : [String]? = nil , removeTags : [String]? = nil , similarDocids : [String]? = nil , dissimilarDocids : [String]? = nil , success : ( String -> Void ) , failure : FailureHandler ) -> Void {
+        
+        // Small closure to convert nil elements into empty strings
+        let f : (AnyObject? -> AnyObject) = { optKey in
+            if let key = optKey { return key }
+            return ""
+        }
+        
+        var params = [String : AnyObject]()
+        params["docids"] = f(docids)
+        params["add_tags"] = f(addTags)
+        params["remove_tags"] = f(removeTags)
+        params["similar_docids"] = f(similarDocids)
+        params["dissimilar_docids"] = f(dissimilarDocids)
+        
+        let headers = [ "Content-Type" : "application/json" ]
+        
+        let body = createJSONBody(params)!
+        let method = "POST"
+        let url = urlForEndpoint(.Feedback)
+        
+        //Will change
+        let parse : (JSONHelper.JSONDictionary -> String? ) = { s -> String? in return s.description }
+        
+        requestWithToken(headers, body: body, method: method, url: url, maxCallCount: maxCallCount, parse: parse , success: success, failure: failure)
+       
     }
     
     private func urlForEndpoint(endpoint : Endpoint) -> NSURL
@@ -245,7 +276,7 @@ public class ClarifaiApi
                     request.HTTPMethod = method;
                     let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { (data , response , error) -> Void in
                         if let httpResponse = response as? NSHTTPURLResponse {
-                            if httpResponse.statusCode == 200 {
+                            if httpResponse.statusCode == 200 || httpResponse.statusCode == 201 { 
                                 if let data = data {
                                     if let jDict = JSONHelper.decodeJSON(data) {
                                         if let statusCode = jDict["status_code"] as? String where statusCode == "TOKEN_EXPIRED"{
@@ -269,9 +300,13 @@ public class ClarifaiApi
                                 }
                             } else if httpResponse.statusCode == 429 {
                                 //TODO : Make it possible to wait x secs and repeat the request
+                                println("Throttled")
                                 failure( .ApiThrottled , data)
                             } else {
                                 failure(.NoSuccessStatusCode(statusCode: httpResponse.statusCode), data)
+                                println("T")
+                                println(NSString(data: data , encoding: NSUTF8StringEncoding))
+                                println(httpResponse.statusCode)
                             }
                         } else {
                             failure(.Other(error), data)
