@@ -11,7 +11,6 @@ import UIKit
 
 public class ClarifaiApi
 {
-    // TODO : Feedback is not implemented 
     // TODO : Images are not resized
     // TODO : No repeating on Throttle
     // TODO : Tests 
@@ -33,7 +32,7 @@ public class ClarifaiApi
     private let apiVersion = "v1"
     
     private var accessToken : String?
-    var apiInfo : ApiInfo?
+    public private(set) var apiInfo : ApiInfo?
     
     private let maxCallCount : Int = 3;
     
@@ -243,26 +242,6 @@ public class ClarifaiApi
         return body;
     }
     
-    ////TEST FUNCTION - which works btw.
-    
-//    func tagUrls(urls : [String]){
-//        var jDict = [String : AnyObject]()
-//        jDict["op"] = "tag,embed"
-//        jDict["model"] = "default"
-//        jDict["url"] = urls
-//        
-//        let headers = [ "Content-Type" : "application/json" ]
-//        let body = createJSONBody(jDict)!
-//        let method = "POST"
-//        let url = urlForEndpoint(.Multiop)
-//        
-//        let failHandler : ( Reason, NSData?) -> Void = { (a,b) in print("FAIL!!!") }
-//        
-//        requestWithToken(headers, body: body, method: method, url: url, maxCallCount: 3 , parse: { $0 } , success: { println(NSString(data: $0, encoding: NSUTF8StringEncoding))  }, failure: failHandler)
-//        
-//    }
-    
-    
     private func requestWithToken<T>(headers : [String:String] , body : NSData , method : String , url : NSURL , maxCallCount : Int , shouldRenewToken:Bool = false , parse : JSONHelper.JSONDictionary -> T? ,  success : T -> Void , failure : (FailReason,NSData?) -> Void ) -> Void
     {
         if(maxCallCount > 0) {
@@ -279,15 +258,7 @@ public class ClarifaiApi
                             if httpResponse.statusCode == 200 || httpResponse.statusCode == 201 { 
                                 if let data = data {
                                     if let jDict = JSONHelper.decodeJSON(data) {
-                                        if let statusCode = jDict["status_code"] as? String where statusCode == "TOKEN_EXPIRED"{
-                                            // Token is expired , a new token will be generated and the request will be resent
-                                            // IMPORTANT : We are using weak self to avoid retain cycles.
-                                            // That means the following recursive call will not be made if
-                                            // the ClarifaiApi instance is deallocated at this point. 
-                                            // Might wanna take a look at that in the future.
-                                            let newCallCount = maxCallCount - 1 //Decreasing the number of calls
-                                            self?.requestWithToken(headers, body: body, method: method, url: url, maxCallCount: newCallCount, shouldRenewToken: true, parse: parse, success: success, failure: failure)
-                                        } else if let result = parse(jDict) {
+                                        if let result = parse(jDict) {
                                             success(result)
                                         } else {
                                             failure(.CouldNotParseJSON, data)
@@ -302,11 +273,20 @@ public class ClarifaiApi
                                 //TODO : Make it possible to wait x secs and repeat the request
                                 println("Throttled")
                                 failure( .ApiThrottled , data)
+                            } else if httpResponse.statusCode == 401 {
+                                // Token is expired or invalid , a new token will be generated and the request will be resent
+                                // IMPORTANT : We are using weak self to avoid retain cycles.
+                                // That means the following recursive call will not be made if
+                                // the ClarifaiApi instance is deallocated at this point.
+                                // Might wanna take a look at that in the future.
+                                println("Token expired or invalid , will request new token")
+                                let newCallCount = maxCallCount - 1 //Decreasing the number of calls
+                                self?.requestWithToken(headers, body: body, method: method, url: url, maxCallCount: newCallCount, shouldRenewToken: true, parse: parse, success: success, failure: failure)
                             } else {
                                 failure(.NoSuccessStatusCode(statusCode: httpResponse.statusCode), data)
-                                println("T")
-                                println(NSString(data: data , encoding: NSUTF8StringEncoding))
-                                println(httpResponse.statusCode)
+//                                println("T")
+//                                println(NSString(data: data , encoding: NSUTF8StringEncoding))
+//                                println(httpResponse.statusCode)
                             }
                         } else {
                             failure(.Other(error), data)
