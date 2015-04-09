@@ -51,7 +51,6 @@ class ViewController: UIViewController {
         // A note on the first parameters used in the following functions
         // The first parameter is of type Operation which is an enum with possible values Tag,Embed,TagAndEmbed
         // It simply used as a declaration of operations that are to be done on the images
-        
         api?.recognizeURLs(.TagAndEmbed, urls: ["http://www.clarifai.com/static/img_ours/autotag_examples/coffee.jpg"], success: recognitionHandler, failure: failHandlerMaker("Failure while recognizing images"))
         
         //Recognizing images from local data

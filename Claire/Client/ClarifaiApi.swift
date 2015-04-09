@@ -11,9 +11,11 @@ import UIKit
 
 public class ClarifaiApi
 {
-    // TODO : Images are not resized
+    // TODO : Images are not resized // Started to implement , not working properly yet
     // TODO : No repeating on Throttle
     // TODO : Tests 
+    
+    public typealias FailureHandler = ((FailReason , NSData?) -> Void)
     
     enum Endpoint : String
     {
@@ -34,9 +36,34 @@ public class ClarifaiApi
     private var accessToken : String?
     public private(set) var apiInfo : ApiInfo?
     
-    private let maxCallCount : Int = 3;
+    private let maxCallCount : Int = 3
     
-    public typealias FailureHandler = ((FailReason , NSData?) -> Void)
+    
+    private var canResize : Bool = false // Not working yet
+    
+    // Hardcoding the values might not be good practice
+    private var maxImageSize : CGFloat {
+        get {
+            if let max = apiInfo?.maxImageSize {
+                return CGFloat(max)
+            }
+            else {
+                // The half of the current max value specified by the API. For some reason , it works like this.
+                // I'm doing something wrong , will figure it out.
+                return 512.0
+            }
+        }
+    }
+    private var minImageSize : CGFloat {
+        get {
+            if let min = apiInfo?.minImageSize {
+                return CGFloat(min)
+            }
+            else {
+                return 224.0
+            }
+        }
+    }
     
     public required init(appID : String , appSecret : String)
     {
@@ -184,7 +211,6 @@ public class ClarifaiApi
         params["dissimilar_docids"] = f(dissimilarDocids)
         
         let headers = [ "Content-Type" : "application/json" ]
-        
         let body = createJSONBody(params)!
         let method = "POST"
         let url = urlForEndpoint(.Feedback)
@@ -232,7 +258,14 @@ public class ClarifaiApi
             appendBoundary(body)
             let header = "Content-Disposition: form-data; name=\"encoded_data\"; filename=\"\(name)\"\r\n" + "Content-Type: image/jpg\r\n\r\n"
             appendString(body,header)
-            let imageData = UIImageJPEGRepresentation(image, 100)
+            let processedImg = canResize ? self.processImage(image) : image;
+//            println(processedImg.size.width)
+//            println(processedImg.size.height)
+            
+            // TODO : Resizing not working might be related to the conversion of UIImage to NSData , look it up
+            // Observed that Clarifai detects the dimensions of the resized image always as 2 * (intendedSize) ; when the intented size is
+            // dropped to the half of the max value , whole operation works. Thus , it should not be that hard to get it right.
+            let imageData = UIImageJPEGRepresentation(processedImg, 100)
             body.appendData(imageData)
             appendString(body,"\r\n")
         }
@@ -242,6 +275,43 @@ public class ClarifaiApi
         return body;
     }
     
+    // Returns a resized version of the image if it is too big or too small. Otherwise , returns the original image.
+    private func processImage(image : UIImage) -> UIImage {
+        if(image.size.width > maxImageSize || image.size.height > maxImageSize){
+            println("Image is too big , resizing")
+            let wScale = maxImageSize / image.size.width
+            let hScale = maxImageSize / image.size.height
+            let imgScale = wScale < hScale ? wScale : hScale;
+            
+            return self.scaleImage(image , scale: imgScale)
+        }
+        else if(image.size.width < minImageSize || image.size.height < minImageSize){
+            println("Image is too small , resizing")
+            let wScale = minImageSize / image.size.width
+            let hScale = minImageSize / image.size.height
+            let imgScale = wScale > hScale ? wScale : hScale;
+            
+            return self.scaleImage(image , scale: imgScale)
+        }
+        else {
+            return image
+        }
+    }
+    
+    private func scaleImage(image : UIImage , scale : CGFloat ) -> UIImage {
+        let size = CGSizeApplyAffineTransform(image.size, CGAffineTransformMakeScale(scale, scale))
+        
+        UIGraphicsBeginImageContextWithOptions(size, true, 0.0)
+        image.drawInRect(CGRect(origin: CGPointZero, size: size))
+        
+        let scaledImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return scaledImage
+    }
+    
+    
+    // TODO : Consider using gcd to make sure success and fail handlers are called from the main thread
     private func requestWithToken<T>(headers : [String:String] , body : NSData , method : String , url : NSURL , maxCallCount : Int , shouldRenewToken:Bool = false , parse : JSONHelper.JSONDictionary -> T? ,  success : T -> Void , failure : (FailReason,NSData?) -> Void ) -> Void
     {
         if(maxCallCount > 0) {

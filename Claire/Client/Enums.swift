@@ -8,12 +8,12 @@
 
 import Foundation
 
+
 public enum Operation : Printable {
     case Embed , Tag , TagAndEmbed
     
     public var description : String { return self.toString() }
     
-    // May change enum to
     private func toString() -> String {
         switch(self){
         case .Embed : return "embed"
@@ -34,4 +34,5 @@ public enum FailReason {
     case ReachedMaxNumberOfCalls
     case ApiThrottled
     case Other(NSError)
+    
 }

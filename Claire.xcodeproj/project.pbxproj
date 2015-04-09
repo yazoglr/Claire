@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		492DBADF1AD202EF0062D4B3 /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 492DBADE1AD202EF0062D4B3 /* Enums.swift */; };
+		495E0F481AD5FA2B009C4454 /* resize-test.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 495E0F471AD5FA2B009C4454 /* resize-test.jpg */; };
+		495E0F4A1AD5FC68009C4454 /* resize-test2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 495E0F491AD5FC68009C4454 /* resize-test2.jpg */; };
 		4964256C1AD1440300A2050D /* ApiInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4964256B1AD1440300A2050D /* ApiInfo.swift */; };
 		499CEB181A90057C00EC800A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 499CEB171A90057C00EC800A /* AppDelegate.swift */; };
 		499CEB1B1A90057C00EC800A /* Claire.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 499CEB191A90057C00EC800A /* Claire.xcdatamodeld */; };
@@ -34,6 +36,8 @@
 
 /* Begin PBXFileReference section */
 		492DBADE1AD202EF0062D4B3 /* Enums.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		495E0F471AD5FA2B009C4454 /* resize-test.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "resize-test.jpg"; sourceTree = "<group>"; };
+		495E0F491AD5FC68009C4454 /* resize-test2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "resize-test2.jpg"; sourceTree = "<group>"; };
 		4964256B1AD1440300A2050D /* ApiInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiInfo.swift; sourceTree = "<group>"; };
 		499CEB121A90057C00EC800A /* Claire.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Claire.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		499CEB161A90057C00EC800A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -93,6 +97,8 @@
 			children = (
 				49DAF9F91AD0C42C001EBF0C /* Client */,
 				49DAF9F51AD0BC9B001EBF0C /* metro-north.jpg */,
+				495E0F491AD5FC68009C4454 /* resize-test2.jpg */,
+				495E0F471AD5FA2B009C4454 /* resize-test.jpg */,
 				499CEB171A90057C00EC800A /* AppDelegate.swift */,
 				499CEB1C1A90057C00EC800A /* ViewController.swift */,
 				499CEB1E1A90057C00EC800A /* Main.storyboard */,
@@ -222,8 +228,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				499CEB201A90057C00EC800A /* Main.storyboard in Resources */,
+				495E0F481AD5FA2B009C4454 /* resize-test.jpg in Resources */,
 				49DAF9F61AD0BC9B001EBF0C /* metro-north.jpg in Resources */,
 				499CEB251A90057C00EC800A /* LaunchScreen.xib in Resources */,
+				495E0F4A1AD5FC68009C4454 /* resize-test2.jpg in Resources */,
 				499CEB221A90057C00EC800A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
