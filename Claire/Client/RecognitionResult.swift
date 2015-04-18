@@ -14,4 +14,11 @@ public struct RecognitionResult
     
     public var embed : [Double]?
     public var tags : [Tag]?
+    public let statusCode : String
+    public let statusMessage : String
+    
+    public init(statusCode : String , statusMessage : String){
+        self.statusCode = statusCode
+        self.statusMessage = statusMessage
+    }
 }

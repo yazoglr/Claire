@@ -23,10 +23,13 @@ public enum Operation : Printable {
     }
 }
 
+//Dummy protocol to enable recursive enum
+public protocol Fail {}
+
 //Inspired by Chris Eidhof
 //TODO : Adapt the enum to make it more explicative , possibly conforming to Printable protocol
-public enum FailReason {
-    case CouldNotGetToken
+public enum FailReason : Fail {
+    case CouldNotGetToken(secondaryReason : Fail ) // Workaround the recursive enum
     case CouldNotParseData
     case CouldNotParseJSON
     case NoData
@@ -34,5 +37,4 @@ public enum FailReason {
     case ReachedMaxNumberOfCalls
     case ApiThrottled
     case Other(NSError)
-    
 }

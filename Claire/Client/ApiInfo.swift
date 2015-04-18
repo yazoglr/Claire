@@ -7,11 +7,12 @@
 //
 
 import Foundation
+import UIKit
 
 public struct ApiInfo : Printable
 {
-    var maxImageSize : Int?
-    var minImageSize : Int?
+    var maxImageSize : CGFloat?
+    var minImageSize : CGFloat?
     var maxBatchSize : Int?
     var embedAllowed : Bool?
     

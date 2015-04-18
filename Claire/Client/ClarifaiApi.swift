@@ -11,9 +11,9 @@ import UIKit
 
 public class ClarifaiApi
 {
-    // TODO : Images are not resized // Started to implement , not working properly yet
     // TODO : No repeating on Throttle
     // TODO : Tests 
+    // TODO : Better failure formation and handling
     
     public typealias FailureHandler = ((FailReason , NSData?) -> Void)
     
@@ -32,6 +32,8 @@ public class ClarifaiApi
     
     private let baseURL : NSURL = NSURL(string : "https://api.clarifai.com")!
     private let apiVersion = "v1"
+    private let defaultModel : String = "default"
+    
     
     private var accessToken : String?
     public private(set) var apiInfo : ApiInfo?
@@ -39,30 +41,14 @@ public class ClarifaiApi
     private let maxCallCount : Int = 3
     
     
-    private var canResize : Bool = false // Not working yet
+    private var canResize : Bool = true
     
     // Hardcoding the values might not be good practice
     private var maxImageSize : CGFloat {
-        get {
-            if let max = apiInfo?.maxImageSize {
-                return CGFloat(max)
-            }
-            else {
-                // The half of the current max value specified by the API. For some reason , it works like this.
-                // I'm doing something wrong , will figure it out.
-                return 512.0
-            }
-        }
+        get { return apiInfo?.maxImageSize ?? 1024.0 }
     }
     private var minImageSize : CGFloat {
-        get {
-            if let min = apiInfo?.minImageSize {
-                return CGFloat(min)
-            }
-            else {
-                return 224.0
-            }
-        }
+        get { return apiInfo?.minImageSize ?? 448.0 }
     }
     
     public required init(appID : String , appSecret : String)
@@ -71,7 +57,7 @@ public class ClarifaiApi
         self.appSecret = appSecret
     }
     
-    private func getAccesToken(renew : Bool = false , success : String -> Void , failure : FailureHandler)
+    private func getAccessToken(renew : Bool = false , success : String -> Void , failure : FailureHandler)
     {
         if renew || accessToken == nil
         {
@@ -87,30 +73,38 @@ public class ClarifaiApi
             let task = NSURLSession.sharedSession().dataTaskWithRequest(request) { [weak self] data , response , error in
                 if let httpResponse = response as? NSHTTPURLResponse {
                     if httpResponse.statusCode == 200 {
-                        if let responseData = data , let json = JSONHelper.decodeJSON(responseData) , let token = json["access_token"] as? String{
-                            println("Requesting new token")
-                            self?.accessToken = token
-                            success(token)
+                        if let responseData = data {
+                            if let json = JSONHelper.decodeJSON(responseData) {
+                                if let token = json["access_token"] as? String {
+                                    println("Requesting new token")
+                                    self?.accessToken = token
+                                    success(token)
+                                } else {
+                                    failure(FailReason.CouldNotGetToken(secondaryReason : FailReason.CouldNotParseJSON) , data)
+                                }
+                            } else {
+                                failure(FailReason.CouldNotGetToken(secondaryReason : FailReason.CouldNotParseData) , data)
+                            }
                         } else {
-                            failure(.CouldNotGetToken , data)
+                            failure(FailReason.CouldNotGetToken(secondaryReason : FailReason.NoData) , data)
                         }
                     } else {
-                        failure(.CouldNotGetToken, data)
+                        failure(FailReason.CouldNotGetToken(secondaryReason:FailReason.NoSuccessStatusCode(statusCode: httpResponse.statusCode)), data)
                     }
                 } else {
-                    failure(.CouldNotGetToken , data)
+                    failure(FailReason.CouldNotGetToken(secondaryReason : FailReason.Other(error)) , data)
                 }
             }
             
             task.resume()
         }
-        else if let accesToken = accessToken {
+        else {
             println("Using token from the cache")
-            success(accesToken) //Could have used forced unwrapping , this feels nicer
+            success(accessToken!)
         }
     }
     
-    func getInfo( success : ApiInfo -> Void , failure : FailureHandler ) {
+   public func getInfo( success : ApiInfo -> Void , failure : FailureHandler ) {
         if let apiInfo = apiInfo {
             success(apiInfo)
         } else {
@@ -120,7 +114,7 @@ public class ClarifaiApi
             let method = "GET"
             requestWithToken(headers, body: body, method: method, url: url , maxCallCount: maxCallCount, parse:
                 { [weak self](dict : JSONHelper.JSONDictionary) -> ApiInfo? in
-                    if let results = dict["results"] as? [String : AnyObject] , let minImageSize = results["min_image_size"] as? Int , let maxImageSize = results["max_image_size"] as? Int , let maxBatchSize = results["max_batch_size"] as? Int , let embedAllowed = results["embed_allowed"] as? Bool{
+                    if let results = dict["results"] as? [String : AnyObject] , let minImageSize = results["min_image_size"] as? CGFloat , let maxImageSize = results["max_image_size"] as? CGFloat , let maxBatchSize = results["max_batch_size"] as? Int , let embedAllowed = results["embed_allowed"] as? Bool{
                         
                         let info = ApiInfo(maxImageSize: maxImageSize, minImageSize: minImageSize, maxBatchSize: maxBatchSize, embedAllowed: embedAllowed)
                         self?.apiInfo = info;
@@ -133,14 +127,16 @@ public class ClarifaiApi
     
     // TODO : Not very elegant , modify
     private func dataParser( dict : JSONHelper.JSONDictionary ) -> [RecognitionResult]? {
-        //println(dict) // for debugging purposes
+       println(dict) // for debugging purposes
         
         if let results = dict["results"] as? [AnyObject] {
             var resultList = [RecognitionResult]()
             for item in results {
-                var rec = RecognitionResult()
                 // TODO : Local id
-                if let result = item["result"] as? [String : AnyObject] {
+                if let result = item["result"] as? [String : AnyObject] , let statusCode = item["status_code"] as? String , let statusMessage = item["status_msg"] as? String {
+                    
+                    var rec = RecognitionResult(statusCode: statusCode, statusMessage: statusMessage)
+                    
                     if let embedArr = result["embed"] as? [Double] {
                         rec.embed = embedArr
                     }
@@ -153,18 +149,18 @@ public class ClarifaiApi
                         }
                         rec.tags = tags
                     }
+                    resultList.append(rec)
                 }
-                resultList.append(rec)
             }
             return resultList
         }
         return nil
     }
     
-    public func recognizeURLs(op : Operation , urls : [String] , success : ([RecognitionResult] -> Void) , failure : FailureHandler){
-        var params = [String : AnyObject]()
+    public func recognizeURLs(op : Operation , model : String = "default" ,  urls : [String] , success : ([RecognitionResult] -> Void) , failure : FailureHandler){
+        var params = JSONHelper.JSONDictionary()
         params["op"] = op.description
-        params["model"] = "default"
+        params["model"] = model
         params["url"] = urls
         
         let headers = [ "Content-Type" : "application/json" ]
@@ -173,10 +169,11 @@ public class ClarifaiApi
         recognize(headers, body: body, success: success, failure: failure)
     }
     
-    public func recognizeMedia( op : Operation , media : [ ( fileName:String,image : UIImage) ] , success : ([RecognitionResult] -> Void) , failure : FailureHandler) {
+    public func recognizeMedia( op : Operation , model : String = "default" , media : [ ( fileName:String,image : UIImage) ] , success : ([RecognitionResult] -> Void) , failure : FailureHandler) {
+        
         var params = [String : String]()
         params["op"] = op.description
-        params["model"] = "default"
+        params["model"] = model
         let boundary = "----------asdaadas1ewedbfandaus1edasdassddwwertttr" // TODO : Change
         let body = createMultipartBody(boundary, params : params , media : media)!
         
@@ -197,18 +194,12 @@ public class ClarifaiApi
     //TODO : Add capability of sending feedback using urls
     func sendFeedback( docids : [String] , addTags : [String]? = nil , removeTags : [String]? = nil , similarDocids : [String]? = nil , dissimilarDocids : [String]? = nil , success : ( String -> Void ) , failure : FailureHandler ) -> Void {
         
-        // Small closure to convert nil elements into empty strings
-        let f : (AnyObject? -> AnyObject) = { optKey in
-            if let key = optKey { return key }
-            return ""
-        }
-        
-        var params = [String : AnyObject]()
-        params["docids"] = f(docids)
-        params["add_tags"] = f(addTags)
-        params["remove_tags"] = f(removeTags)
-        params["similar_docids"] = f(similarDocids)
-        params["dissimilar_docids"] = f(dissimilarDocids)
+        var params = JSONHelper.JSONDictionary()
+        params["docids"] = docids ?? ""
+        params["add_tags"] = addTags ?? ""
+        params["remove_tags"] = removeTags ?? ""
+        params["similar_docids"] = similarDocids ?? ""
+        params["dissimilar_docids"] = dissimilarDocids ?? ""
         
         let headers = [ "Content-Type" : "application/json" ]
         let body = createJSONBody(params)!
@@ -241,7 +232,7 @@ public class ClarifaiApi
     //Currently the return value is never optional , dangerous forced unwrapping exists. Might wanna change that.
     private func createMultipartBody(boundary : String , params : [String : String] , media : [ ( fileName:String,image : UIImage) ]) -> NSData?
     {
-        let appendString : (NSMutableData , String) -> Void = { data , str -> Void in data.appendData( NSString(string:str).dataUsingEncoding(NSUTF8StringEncoding)! )}
+        let appendString : (NSMutableData , String) -> Void = { data , str -> Void in data.appendData( (str as NSString).dataUsingEncoding(NSUTF8StringEncoding)! )}
         let appendBoundary : (NSMutableData -> Void) = { data -> Void in  appendString(data , "--\(boundary)\r\n")  }
         
         let body = NSMutableData()
@@ -256,7 +247,7 @@ public class ClarifaiApi
         //Write the media
         for (name , image) in media {
             appendBoundary(body)
-            let header = "Content-Disposition: form-data; name=\"encoded_data\"; filename=\"\(name)\"\r\n" + "Content-Type: image/jpg\r\n\r\n"
+            let header = "Content-Disposition: form-data; name=\"encoded_data\"; filename=\"\(name)\"\r\n" + "Content-Type: image/jpeg\r\n\r\n"
             appendString(body,header)
             let processedImg = canResize ? self.processImage(image) : image;
 //            println(processedImg.size.width)
@@ -265,7 +256,7 @@ public class ClarifaiApi
             // TODO : Resizing not working might be related to the conversion of UIImage to NSData , look it up
             // Observed that Clarifai detects the dimensions of the resized image always as 2 * (intendedSize) ; when the intented size is
             // dropped to the half of the max value , whole operation works. Thus , it should not be that hard to get it right.
-            let imageData = UIImageJPEGRepresentation(processedImg, 100)
+            let imageData = UIImageJPEGRepresentation(processedImg, 90)
             body.appendData(imageData)
             appendString(body,"\r\n")
         }
@@ -301,7 +292,7 @@ public class ClarifaiApi
     private func scaleImage(image : UIImage , scale : CGFloat ) -> UIImage {
         let size = CGSizeApplyAffineTransform(image.size, CGAffineTransformMakeScale(scale, scale))
         
-        UIGraphicsBeginImageContextWithOptions(size, true, 0.0)
+        UIGraphicsBeginImageContextWithOptions(size, true, 1.0)
         image.drawInRect(CGRect(origin: CGPointZero, size: size))
         
         let scaledImage = UIGraphicsGetImageFromCurrentImageContext()
@@ -315,7 +306,7 @@ public class ClarifaiApi
     private func requestWithToken<T>(headers : [String:String] , body : NSData , method : String , url : NSURL , maxCallCount : Int , shouldRenewToken:Bool = false , parse : JSONHelper.JSONDictionary -> T? ,  success : T -> Void , failure : (FailReason,NSData?) -> Void ) -> Void
     {
         if(maxCallCount > 0) {
-            getAccesToken(renew: shouldRenewToken, success: { [weak self] token -> Void in
+            getAccessToken(renew: shouldRenewToken, success: { [weak self] token -> Void in
                     let request = NSMutableURLRequest(URL: url)
                     request.setValue("Bearer \(token)" , forHTTPHeaderField: "Authorization" )
                     for(key , value) in headers{
@@ -354,9 +345,6 @@ public class ClarifaiApi
                                 self?.requestWithToken(headers, body: body, method: method, url: url, maxCallCount: newCallCount, shouldRenewToken: true, parse: parse, success: success, failure: failure)
                             } else {
                                 failure(.NoSuccessStatusCode(statusCode: httpResponse.statusCode), data)
-//                                println("T")
-//                                println(NSString(data: data , encoding: NSUTF8StringEncoding))
-//                                println(httpResponse.statusCode)
                             }
                         } else {
                             failure(.Other(error), data)
