@@ -11,7 +11,6 @@ import UIKit
 
 public class ClarifaiApi
 {
-    // TODO : No repeating on Throttle
     // TODO : Tests 
     // TODO : Better failure formation and handling
     
@@ -42,6 +41,7 @@ public class ClarifaiApi
     
     
     private var canResize : Bool = true
+    private var shouldRepeatOnThrottle : Bool = false
     
     // Hardcoding the values might not be good practice
     private var maxImageSize : CGFloat {
@@ -112,7 +112,7 @@ public class ClarifaiApi
             let headers = ["Content-Type" : "application/json" ]
             let body = NSMutableData();
             let method = "GET"
-            requestWithToken(headers, body: body, method: method, url: url , maxCallCount: maxCallCount, parse:
+            requestWithToken(headers, body: body, method: method, url: url , maxCallCount: self.maxCallCount, shouldRepeatOnThrottle : self.shouldRepeatOnThrottle , parse:
                 { [weak self](dict : JSONHelper.JSONDictionary) -> ApiInfo? in
                     if let results = dict["results"] as? [String : AnyObject] , let minImageSize = results["min_image_size"] as? CGFloat , let maxImageSize = results["max_image_size"] as? CGFloat , let maxBatchSize = results["max_batch_size"] as? Int , let embedAllowed = results["embed_allowed"] as? Bool{
                         
@@ -127,7 +127,7 @@ public class ClarifaiApi
     
     // TODO : Not very elegant , modify
     private func dataParser( dict : JSONHelper.JSONDictionary ) -> [RecognitionResult]? {
-       println(dict) // for debugging purposes
+       //println(dict) // for debugging purposes
         
         if let results = dict["results"] as? [AnyObject] {
             var resultList = [RecognitionResult]()
@@ -187,7 +187,7 @@ public class ClarifaiApi
         let method = "POST"
         let url = urlForEndpoint(.Multiop)
         
-        requestWithToken(headers, body: body, method: method, url: url, maxCallCount: maxCallCount, parse: dataParser, success: success, failure: failure)
+        requestWithToken(headers, body: body, method: method, url: url, maxCallCount: self.maxCallCount, shouldRepeatOnThrottle : self.shouldRepeatOnThrottle , parse: dataParser, success: success, failure: failure)
     }
     
     //TODO : Modify 
@@ -209,7 +209,7 @@ public class ClarifaiApi
         //Will change
         let parse : (JSONHelper.JSONDictionary -> String? ) = { s -> String? in return s.description }
         
-        requestWithToken(headers, body: body, method: method, url: url, maxCallCount: maxCallCount, parse: parse , success: success, failure: failure)
+        requestWithToken(headers, body: body, method: method, url: url, maxCallCount: self.maxCallCount, shouldRepeatOnThrottle : self.shouldRepeatOnThrottle , parse: parse , success: success, failure: failure)
        
     }
     
@@ -303,7 +303,7 @@ public class ClarifaiApi
     
     
     // TODO : Consider using gcd to make sure success and fail handlers are called from the main thread
-    private func requestWithToken<T>(headers : [String:String] , body : NSData , method : String , url : NSURL , maxCallCount : Int , shouldRenewToken:Bool = false , parse : JSONHelper.JSONDictionary -> T? ,  success : T -> Void , failure : (FailReason,NSData?) -> Void ) -> Void
+    private func requestWithToken<T>(headers : [String:String] , body : NSData , method : String , url : NSURL , maxCallCount : Int , shouldRenewToken:Bool = false , shouldRepeatOnThrottle : Bool = false , parse : JSONHelper.JSONDictionary -> T? ,  success : T -> Void , failure : (FailReason,NSData?) -> Void ) -> Void
     {
         if(maxCallCount > 0) {
             getAccessToken(renew: shouldRenewToken, success: { [weak self] token -> Void in
@@ -333,7 +333,12 @@ public class ClarifaiApi
                             } else if httpResponse.statusCode == 429 {
                                 //TODO : Make it possible to wait x secs and repeat the request
                                 println("Throttled")
-                                failure( .ApiThrottled , data)
+                                if(shouldRepeatOnThrottle){
+                                    let newCallCount = maxCallCount - 1 //Decreasing the number of calls
+                                    self?.requestWithToken(headers, body: body, method: method, url: url, maxCallCount: newCallCount, shouldRepeatOnThrottle: true, parse: parse, success: success, failure: failure)
+                                } else {
+                                    failure( .ApiThrottled , data)
+                                }
                             } else if httpResponse.statusCode == 401 {
                                 // Token is expired or invalid , a new token will be generated and the request will be resent
                                 // IMPORTANT : We are using weak self to avoid retain cycles.
