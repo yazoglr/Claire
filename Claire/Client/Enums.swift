@@ -29,7 +29,9 @@ public protocol Fail {}
 //Inspired by Chris Eidhof
 //TODO : Adapt the enum to make it more explicative , possibly conforming to Printable protocol
 public enum FailReason : Fail {
-    case CouldNotGetToken(secondaryReason : Fail ) // Workaround the recursive enum
+    case CouldNotGetToken(secondaryReason : Fail ) // Workaround the recursive enum 
+    //TODO: Should change this ? 
+    //Since it is possible to go like -> CouldNotGetToken(secondaryReason : CouldNotGetToken(secondaryReason: ...)) etc. it feels like a bad practice.Consider splitting the enum and creating a clear organization for handling errors.
     case CouldNotParseData
     case CouldNotParseJSON
     case NoData

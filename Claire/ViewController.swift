@@ -59,9 +59,9 @@ class ViewController: UIViewController {
         api?.recognizeMedia(Operation.TagAndEmbed, media: [("metro",img)] , success : recognitionHandler , failure : failHandlerMaker("Failure while recognizing media"))
         
         //Sending feedback example
-//        api?.sendFeedback(["78c742b9dee940c8cf2a06f860025141"] ,dissimilarDocids: ["acd57ec10abcc0f4507475827626785f"],
-//            success: { str in println("Printing feedback result"); println(str); println("Done printing feedback result.") },
-//            failure: failHandlerMaker("Failure while getting feedback"))
+        api?.sendFeedback(["78c742b9dee940c8cf2a06f860025141"] ,dissimilarDocids: ["acd57ec10abcc0f4507475827626785f"],
+            success: { fb in println("Printing feedback result"); println("Feedback Message : \(fb.statusMessage) , Feedback Code : \(fb.statusCode) "  ); println("Done printing feedback result.") },
+            failure: failHandlerMaker("Failure while getting feedback"))
 
     }
     

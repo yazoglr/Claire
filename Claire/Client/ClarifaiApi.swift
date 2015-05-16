@@ -192,7 +192,7 @@ public class ClarifaiApi
     
     //TODO : Modify 
     //TODO : Add capability of sending feedback using urls
-    func sendFeedback( docids : [String] , addTags : [String]? = nil , removeTags : [String]? = nil , similarDocids : [String]? = nil , dissimilarDocids : [String]? = nil , success : ( String -> Void ) , failure : FailureHandler ) -> Void {
+    func sendFeedback( docids : [String] , addTags : [String]? = nil , removeTags : [String]? = nil , similarDocids : [String]? = nil , dissimilarDocids : [String]? = nil , success : ( FeedbackResult -> Void ) , failure : FailureHandler ) -> Void {
         
         var params = JSONHelper.JSONDictionary()
         params["docids"] = docids ?? ""
@@ -207,7 +207,12 @@ public class ClarifaiApi
         let url = urlForEndpoint(.Feedback)
         
         //Will change
-        let parse : (JSONHelper.JSONDictionary -> String? ) = { s -> String? in return s.description }
+        let parse : (JSONHelper.JSONDictionary -> FeedbackResult? ) = { jsonArr -> FeedbackResult? in
+            if let sCode = jsonArr["status_code"] as? String , let sMsg = jsonArr["status_msg"] as? String {
+                return FeedbackResult(statusCode: sCode, statusMessage: sMsg)
+            }
+            return nil
+        }
         
         requestWithToken(headers, body: body, method: method, url: url, maxCallCount: self.maxCallCount, shouldRepeatOnThrottle : self.shouldRepeatOnThrottle , parse: parse , success: success, failure: failure)
        
@@ -334,8 +339,8 @@ public class ClarifaiApi
                                 //TODO : Make it possible to wait x secs and repeat the request
                                 println("Throttled")
                                 if(shouldRepeatOnThrottle){
-                                    let newCallCount = maxCallCount - 1 //Decreasing the number of calls
-                                    self?.requestWithToken(headers, body: body, method: method, url: url, maxCallCount: newCallCount, shouldRepeatOnThrottle: true, parse: parse, success: success, failure: failure)
+                                    //Decreasing the max number of calls and repeating the request.
+                                    self?.requestWithToken(headers, body: body, method: method, url: url, maxCallCount: maxCallCount - 1, shouldRepeatOnThrottle: true, parse: parse, success: success, failure: failure)
                                 } else {
                                     failure( .ApiThrottled , data)
                                 }
