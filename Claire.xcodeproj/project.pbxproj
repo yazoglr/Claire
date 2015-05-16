@@ -21,7 +21,7 @@
 		49DAF9F61AD0BC9B001EBF0C /* metro-north.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 49DAF9F51AD0BC9B001EBF0C /* metro-north.jpg */; };
 		49DAF9FD1AD0C45C001EBF0C /* ClarifaiApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DAF9FA1AD0C45C001EBF0C /* ClarifaiApi.swift */; };
 		49DAF9FE1AD0C45C001EBF0C /* JSONHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DAF9FB1AD0C45C001EBF0C /* JSONHelper.swift */; };
-		49DAF9FF1AD0C45C001EBF0C /* RecognitionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DAF9FC1AD0C45C001EBF0C /* RecognitionResult.swift */; };
+		49DAF9FF1AD0C45C001EBF0C /* ApiResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DAF9FC1AD0C45C001EBF0C /* ApiResult.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,7 +53,7 @@
 		49DAF9F51AD0BC9B001EBF0C /* metro-north.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "metro-north.jpg"; sourceTree = "<group>"; };
 		49DAF9FA1AD0C45C001EBF0C /* ClarifaiApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClarifaiApi.swift; sourceTree = "<group>"; };
 		49DAF9FB1AD0C45C001EBF0C /* JSONHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONHelper.swift; sourceTree = "<group>"; };
-		49DAF9FC1AD0C45C001EBF0C /* RecognitionResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecognitionResult.swift; sourceTree = "<group>"; };
+		49DAF9FC1AD0C45C001EBF0C /* ApiResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApiResult.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,7 +140,7 @@
 			children = (
 				49DAF9FA1AD0C45C001EBF0C /* ClarifaiApi.swift */,
 				49DAF9FB1AD0C45C001EBF0C /* JSONHelper.swift */,
-				49DAF9FC1AD0C45C001EBF0C /* RecognitionResult.swift */,
+				49DAF9FC1AD0C45C001EBF0C /* ApiResult.swift */,
 				4964256B1AD1440300A2050D /* ApiInfo.swift */,
 				492DBADE1AD202EF0062D4B3 /* Enums.swift */,
 			);
@@ -252,7 +252,7 @@
 			files = (
 				49DAF9FD1AD0C45C001EBF0C /* ClarifaiApi.swift in Sources */,
 				499CEB1D1A90057C00EC800A /* ViewController.swift in Sources */,
-				49DAF9FF1AD0C45C001EBF0C /* RecognitionResult.swift in Sources */,
+				49DAF9FF1AD0C45C001EBF0C /* ApiResult.swift in Sources */,
 				499CEB181A90057C00EC800A /* AppDelegate.swift in Sources */,
 				4964256C1AD1440300A2050D /* ApiInfo.swift in Sources */,
 				49DAF9FE1AD0C45C001EBF0C /* JSONHelper.swift in Sources */,

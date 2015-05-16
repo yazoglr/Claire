@@ -114,9 +114,9 @@ public class ClarifaiApi
             let method = "GET"
             requestWithToken(headers, body: body, method: method, url: url , maxCallCount: self.maxCallCount, shouldRepeatOnThrottle : self.shouldRepeatOnThrottle , parse:
                 { [weak self](dict : JSONHelper.JSONDictionary) -> ApiInfo? in
-                    if let results = dict["results"] as? [String : AnyObject] , let minImageSize = results["min_image_size"] as? CGFloat , let maxImageSize = results["max_image_size"] as? CGFloat , let maxBatchSize = results["max_batch_size"] as? Int , let embedAllowed = results["embed_allowed"] as? Bool{
+                    if let sCode = dict["status_code"] as? String , let sMsg = dict["status_msg"] as? String , let results = dict["results"] as? [String : AnyObject] , let minImageSize = results["min_image_size"] as? CGFloat , let maxImageSize = results["max_image_size"] as? CGFloat , let maxBatchSize = results["max_batch_size"] as? Int , let embedAllowed = results["embed_allowed"] as? Bool{
                         
-                        let info = ApiInfo(maxImageSize: maxImageSize, minImageSize: minImageSize, maxBatchSize: maxBatchSize, embedAllowed: embedAllowed)
+                        let info = ApiInfo(maxImageSize: maxImageSize, minImageSize: minImageSize, maxBatchSize: maxBatchSize, embedAllowed: embedAllowed , statusCode : sCode , statusMessage : sMsg)
                         self?.apiInfo = info;
                         return info;
                     }

@@ -9,12 +9,15 @@
 import Foundation
 import UIKit
 
-public struct ApiInfo : Printable
+public struct ApiInfo : Printable , ApiResult 
 {
     var maxImageSize : CGFloat?
     var minImageSize : CGFloat?
     var maxBatchSize : Int?
     var embedAllowed : Bool?
+    
+    public let statusCode : String
+    public let statusMessage : String
     
     //TODO : Reform
     public var description : String {
